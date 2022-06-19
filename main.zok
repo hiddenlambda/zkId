@@ -1,0 +1,37 @@
+from "ecc/babyjubjubParams" import BABYJUBJUB_PARAMS
+from "field" import FIELD_SIZE_IN_BITS
+import "signatures/verifyEddsa.code" as verifyEddsa
+import "hashes/mimcSponge/mimcSponge" as hash
+import "utils/pack/bool/unpack"
+import "utils/casts/u32_from_bits"
+import "utils/casts/bool_array_to_u32_array" as bool_to_u32
+
+def m(field input) -> u32[8]:
+    bool[256] bits = unpack(input)
+    u32[8] res = bool_to_u32(bits)
+    return res
+
+struct Credentials {
+    field apk
+    field app_x
+    field app_y
+    field sapp_r_x
+    field sapp_r_y
+    field sapp_s
+}
+
+def main (private Credentials creds, field r, field s_x, field s_y, field ap_x, field ap_y, field e_x, field e_y):
+    field[2] h = hash([creds.apk, creds.app_x, creds.app_y, creds.sapp_r_x, creds.sapp_r_y, creds.sapp_s], 3)
+    assert(h[0] == e_x)
+    assert(h[1] == e_y)
+
+    field[2] aph = hash([creds.apk], 3)
+    assert(aph[0] == creds.app_x)
+    assert(aph[1] == creds.app_y)
+    
+    field[2] rh = hash([r,creds.apk], 3)
+    assert(s_x == rh[0])
+    assert(s_y == rh[1])
+
+    assert(verifyEddsa([creds.sapp_r_x, creds.sapp_r_y], creds.sapp_s, [ap_x, ap_y], m(creds.app_x), m(creds.app_y), BABYJUBJUB_PARAMS))
+    return
