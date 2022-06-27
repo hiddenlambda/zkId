@@ -19,12 +19,12 @@ f(fp, fk):
 g(gp, gk) <- f:
     - p(k), ap(ak), e
     directAuth ...
-    register(p, ap, e=hash(app, a.register(app), apk))
+    register(p, ap, e=hash(apk, app, a.register(app)))
         checkIfNotExists(p)
     federatedAuth(p, ap, r, s=hash(r, apk), pr=createProof((r, s, ap, e),(apk, app, sapp),proofCircuit))
         checkProof(pr, (r, s, ap, e=f[p,ap]))
     proofCircuit(public=(r, s, ap, e), witness=(apk, app, sapp)) = 0 iff
-        - e = hash(app, sapp, apk)
+        - e = hash(apk, app, sapp)
         - app = hash(apk)
         - s = hash(r, apk)
         - verfifySign(sapp, app, ap)

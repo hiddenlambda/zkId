@@ -7,9 +7,6 @@ run:
 	cd ${OUT_DIR} && \
 	([ -f out ] || zokrates compile -i ../main.zok) && \
 	(([ -f proving.key ] && [ -f verification.key ]) || zokrates setup) && \
-	([ -f witness ] || cat inputs.txt | zokrates compute-witness --stdin) && \
+	([ -f witness ] || ([ -f inputs.txt ] && cat inputs.txt | zokrates compute-witness --stdin)) && \
 	([ -f proof.json ] || zokrates generate-proof) && \
 	zokrates verify
-
-sign:
-	python sign.py
